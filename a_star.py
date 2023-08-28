@@ -70,17 +70,17 @@ class Matrix:
 class Matrix5x5(Matrix):
 
     def __init__(self, matrix: Matrix) -> None:
+        super().__init__([[]])
         self._baseMatrix = matrix
         self._maxx = matrix._maxx * 5
         self._maxy = matrix._maxy * 5
-        self._weights = []
 
     def getWeight(self, node: Node) -> int:
         sectorX = node.x // self._baseMatrix.getMaxX()
         sectorY = node.y // self._baseMatrix.getMaxY()
         inSectorX = node.x % self._baseMatrix.getMaxX()
         inSectorY = node.y % self._baseMatrix.getMaxY()
-        weight = self._baseMatrix._weights[inSectorY][inSectorX] + sectorX + sectorY
+        weight = self._baseMatrix.getWeight(Node(inSectorX, inSectorY)) + sectorX + sectorY
         weight = ((weight - 1) % 9) + 1
         return weight
 
