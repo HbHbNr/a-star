@@ -1,3 +1,4 @@
+"""A* search algorithm for graphs"""
 from typing import List, NamedTuple, Dict
 from dataclasses import dataclass
 import heapq
@@ -5,6 +6,7 @@ import fileinput
 
 
 class Node(NamedTuple):
+    """A node of the graph"""
 
     x: int
     y: int
@@ -23,6 +25,7 @@ class Node(NamedTuple):
 
 @dataclass(order=True)
 class PathNode:
+    """A node of the traversed graph"""
 
     pathLength: int
     distanceFromStart: int
@@ -34,6 +37,7 @@ class PathNode:
 
 
 class Matrix:
+    """A graph of nodes represented as a matrix"""
 
     def __init__(self, weights: List[List[int]]) -> None:
         self._maxx = len(weights[0])
@@ -68,6 +72,10 @@ class Matrix:
 
 
 class Matrix5x5(Matrix):
+    """
+    A graph of nodes represented as a matrix, five times larger in every direction than the base matrix.
+    Very special weights are calculated as requested in https://adventofcode.com/2021/day/15.
+    """
 
     def __init__(self, matrix: Matrix) -> None:
         super().__init__([[]])
@@ -86,6 +94,7 @@ class Matrix5x5(Matrix):
 
 
 class MatrixAStar:
+    """The actual A* search algorithm for graphs"""
 
     @classmethod
     def findPath(cls, matrix: Matrix, startNode: Node, targetNode: Node) -> int:

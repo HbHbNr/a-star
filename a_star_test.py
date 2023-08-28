@@ -1,3 +1,4 @@
+"""Unit tests for A* search algorithm classes"""
 from typing import List
 from a_star import Node, Matrix, Matrix5x5, MatrixAStar, readinputfile
 
