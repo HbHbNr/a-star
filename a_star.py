@@ -12,10 +12,10 @@ class Node(NamedTuple):
     def heuristicPathLength(self, target: 'Node') -> int:
         diffx = abs(target.x - self.x)
         diffy = abs(target.y - self.y)
-        h = diffx + diffy  # Manhattan distance
+        hhh = diffx + diffy  # Manhattan distance
         if diffx and diffy:
-            h -= 1  # count crossroad only once
-        return h
+            hhh -= 1  # count crossroad only once
+        return hhh
 
     def __repr__(self) -> str:
         return f'({self.x}/{self.y})'
@@ -142,10 +142,10 @@ class MatrixAStar:
         neighbourNodes: List[Node] = matrix.findNeighbourNodes(isNodeInCloseList, currentNode, currentPathNode.parent)
         validNeighbours: List[PathNode] = []
         for neighbourNode in neighbourNodes:
-            g = distanceFromStart + matrix.getWeight(neighbourNode)
-            h = neighbourNode.heuristicPathLength(targetNode)
-            f = g + h
-            neighbourPathNode = PathNode(f, g, neighbourNode, currentNode)
+            ggg = distanceFromStart + matrix.getWeight(neighbourNode)
+            hhh = neighbourNode.heuristicPathLength(targetNode)
+            fff = ggg + hhh
+            neighbourPathNode = PathNode(fff, ggg, neighbourNode, currentNode)
             # print('    ', neighbourPathNode, sep='')
             validNeighbours.append(neighbourPathNode)
         return validNeighbours

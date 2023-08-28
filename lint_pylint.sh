@@ -12,4 +12,4 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Check conventions with pylint..."
-pylint --exit-zero --good-names=f,g,h **/*.py
+pylint --exit-zero **/*.py
