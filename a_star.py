@@ -88,9 +88,8 @@ class MatrixAStar:
                 needsHeapify = False
                 for neighbour in neighbours:  # all neighbours are not in closeList
                     if neighbour.node not in openListMap:
-                        openList.append(neighbour)
+                        heapq.heappush(openList, neighbour)
                         openListMap[neighbour.node] = neighbour
-                        needsHeapify = True
                         # print('  ', neighbour, ' new', sep='')
                     else:
                         oldneighbour: PathNode = openListMap[neighbour.node]
