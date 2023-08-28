@@ -33,7 +33,7 @@ class PathNode:
         return f'({self.pathLength};{self.distanceFromStart};{self.node};{self.parent})'
 
 
-class Graph:
+class Matrix:
 
     def __init__(self, weights: List[List[int]]) -> None:
         self._maxx = len(weights[0])
@@ -44,7 +44,14 @@ class Graph:
         self._weights.append([9] * (1 + self._maxx + 1))
         print(self._weights)
 
-    def findPath(self, startNode: Node, targetNode: Node) -> int:
+    def getWeight(self, node: Node) -> int:
+        return self._weights[node.y][node.x]
+
+
+class MatrixAStar:
+
+    @classmethod
+    def findPath(cls, matrix: Matrix, startNode: Node, targetNode: Node) -> int:
         openList: List[PathNode] = []  # heapq
         # startNode is its own parent:
         openList.append(PathNode(startNode.heuristicPathLength(targetNode), 0, startNode, startNode))
@@ -62,7 +69,8 @@ class Graph:
                 break
             else:
                 closeList[currentPathNode.node] = currentPathNode
-                neighbours: List[PathNode] = self.findNeighbours(closeList, distanceFromStart, currentPathNode, targetNode)
+                neighbours: List[PathNode] = \
+                    cls.findNeighbours(matrix, closeList, distanceFromStart, currentPathNode, targetNode)
                 needsHeapify = False
                 for neighbour in neighbours:  # all neighbours are not in closeList
                     if neighbour.node not in openListMap:
@@ -85,18 +93,19 @@ class Graph:
                     heapq.heapify(openList)
         return currentPathNode.pathLength
 
-    def findNeighbours(self, closeList, distanceFromStart: int, currentPathNode: PathNode, targetNode: Node) \
+    @classmethod
+    def findNeighbours(cls, matrix: Matrix, closeList, distanceFromStart: int, currentPathNode: PathNode, targetNode: Node) \
             -> List[PathNode]:
         neighbours: List[PathNode] = []
         for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)]:  # right, below, left, above
             neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
-            if neighbourNode.x == self._maxx + 1 or neighbourNode.y == self._maxy + 1 \
+            if neighbourNode.x == matrix._maxx + 1 or neighbourNode.y == matrix._maxy + 1 \
                     or neighbourNode.x == 0 or neighbourNode.y == 0:
                 continue  # ignore coordinates outside of the matrix
             else:
                 print('  Neighbour:', neighbourNode)
             if neighbourNode not in closeList:
-                g = distanceFromStart + self._weights[neighbourNode.y][neighbourNode.x]
+                g = distanceFromStart + matrix.getWeight(neighbourNode)
                 h = neighbourNode.heuristicPathLength(targetNode)
                 f = g + h
                 neighbourPathNode = PathNode(f, g, neighbourNode, currentPathNode.node)
@@ -115,33 +124,11 @@ def readinputfile(inputfile: str) -> List[List[int]]:
 
 
 if __name__ == '__main__':
-    # weightsstring = \
-    #     '1163751742,1381373672,2136511328,3694931569,7463417111,1319128137,1359912421,3125421639,1293138521,2311944581'
-    # startNode = Node(1, 1)
-    # targetNode = Node(10, 10)
-    # -> distance: 40
-
-    # weightsstring = '1163,1381,2136'
-    # startNode = Node(1, 1)
-    # targetNode = Node(4, 3)
-    # -> distance: 13
-
-    # weightsstring = '116,138,213'
-    # startNode = Node(1, 1)
-    # targetNode = Node(3, 3)
-    # -> distance: 7
-
-    # weightsstring = '12,13'
-    # startNode = Node(1, 1)
-    # targetNode = Node(2, 2)
-    # -> distance: 4
-    # weights: List[List[int]] = [list(map(int, list(row))) for row in weightsstring.split(',')]
-
-    # weights = readinputfile('../adventofcode2021/inputfiles/day15_example.txt')
-    weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
+    weights = readinputfile('../adventofcode2021/inputfiles/day15_example.txt')
+    # weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
     startNode = Node(1, 1)
     targetNode = Node(len(weights[0]), len(weights))
 
-    graph = Graph(weights)
-    distanceFromStart = graph.findPath(startNode, targetNode)  # consider additional frame with 9s
+    matrix = Matrix(weights)
+    distanceFromStart = MatrixAStar.findPath(matrix, startNode, targetNode)
     print(distanceFromStart)
