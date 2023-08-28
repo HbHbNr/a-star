@@ -134,10 +134,10 @@ class MatrixAStar:
         # no path between startNode and targetNode
         return -1
 
-    # pylint: disable=too-many-arguments
     @classmethod
     def findValidNeighbours(cls, matrix: Matrix, isNodeInCloseList, distanceFromStart: int, currentPathNode: PathNode,
                             targetNode: Node) -> List[PathNode]:
+        # pylint: disable=too-many-arguments
         currentNode = currentPathNode.node
         neighbourNodes: List[Node] = matrix.findNeighbourNodes(isNodeInCloseList, currentNode, currentPathNode.parent)
         validNeighbours: List[PathNode] = []
