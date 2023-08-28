@@ -41,6 +41,21 @@ class Matrix:
         self._weights = weights
         # print(self._weights)
 
+    def findNeighbourNodes(self, isNodeInCloseList, currentPathNode: PathNode) -> List[Node]:
+        neighbourNodes: List[Node] = []
+        for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)]:  # right, below, left, above
+            neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
+            # TODO: ignore if exactly one step back
+            if neighbourNode.x == self._maxx or neighbourNode.y == self._maxy \
+                    or neighbourNode.x == -1 or neighbourNode.y == -1:
+                continue  # ignore coordinates outside of the matrix
+            # print('  Neighbour:', neighbourNode)
+            if isNodeInCloseList(neighbourNode):
+                # print('    ignored, because in closeList')
+                continue
+            neighbourNodes.append(neighbourNode)
+        return neighbourNodes
+
     def getWeight(self, node: Node) -> int:
         return self._weights[node.y][node.x]
 
@@ -113,24 +128,9 @@ class MatrixAStar:
             return -1
 
     @classmethod
-    def findNeighbours(cls, matrix: Matrix, isNodeInCloseList, currentPathNode: PathNode) -> List[Node]:
-        neighbourNodes: List[Node] = []
-        for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)]:  # right, below, left, above
-            neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
-            if neighbourNode.x == matrix._maxx or neighbourNode.y == matrix._maxy \
-                    or neighbourNode.x == -1 or neighbourNode.y == -1:
-                continue  # ignore coordinates outside of the matrix
-            # print('  Neighbour:', neighbourNode)
-            if isNodeInCloseList(neighbourNode):
-                # print('    ignored, because in closeList')
-                continue
-            neighbourNodes.append(neighbourNode)
-        return neighbourNodes
-
-    @classmethod
     def findValidNeighbours(cls, matrix: Matrix, isNodeInCloseList, distanceFromStart: int, currentPathNode: PathNode,
                             targetNode: Node) -> List[PathNode]:
-        neighbourNodes: List[Node] = cls.findNeighbours(matrix, isNodeInCloseList, currentPathNode)
+        neighbourNodes: List[Node] = matrix.findNeighbourNodes(isNodeInCloseList, currentPathNode)
         validNeighbours: List[PathNode] = []
         for neighbourNode in neighbourNodes:
             g = distanceFromStart + matrix.getWeight(neighbourNode)
