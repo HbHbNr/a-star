@@ -158,8 +158,8 @@ def readinputfile(inputfile: str) -> List[List[int]]:
 
 
 def main():
-    # weights = readinputfile('../adventofcode2021/inputfiles/day15_example.txt')
-    weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
+    # weights = readinputfile('inputfiles/aoc2021_day15_example.txt')
+    weights = readinputfile('inputfiles/aoc2021_day15_input.txt')
     startNode = Node(0, 0)
 
     matrix = Matrix(weights)
