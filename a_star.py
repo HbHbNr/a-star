@@ -60,6 +60,12 @@ class Matrix:
     def getWeight(self, node: Node) -> int:
         return self._weights[node.y][node.x]
 
+    def getMaxX(self):
+        return self._maxx
+
+    def getMaxY(self):
+        return self._maxy
+
 
 class Matrix5x5(Matrix):
 
@@ -70,10 +76,10 @@ class Matrix5x5(Matrix):
         self._weights = []
 
     def getWeight(self, node: Node) -> int:
-        sectorX = node.x // self._baseMatrix._maxx
-        sectorY = node.y // self._baseMatrix._maxy
-        inSectorX = node.x % self._baseMatrix._maxx
-        inSectorY = node.y % self._baseMatrix._maxy
+        sectorX = node.x // self._baseMatrix.getMaxX()
+        sectorY = node.y // self._baseMatrix.getMaxY()
+        inSectorX = node.x % self._baseMatrix.getMaxX()
+        inSectorY = node.y % self._baseMatrix.getMaxY()
         weight = self._baseMatrix._weights[inSectorY][inSectorX] + sectorX + sectorY
         weight = ((weight - 1) % 9) + 1
         return weight
@@ -151,7 +157,7 @@ def readinputfile(inputfile: str) -> List[List[int]]:
     return weights
 
 
-if __name__ == '__main__':
+def main():
     # weights = readinputfile('../adventofcode2021/inputfiles/day15_example.txt')
     weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
     startNode = Node(0, 0)
@@ -165,3 +171,7 @@ if __name__ == '__main__':
     targetNode = Node(len(weights[0]) * 5 - 1, len(weights) * 5 - 1)
     distanceFromStart = MatrixAStar.findPath(matrix5x5, startNode, targetNode)
     print('Day {:>3}: {}'.format('15b', distanceFromStart))  # e:315 / i:2800
+
+
+if __name__ == '__main__':
+    main()
