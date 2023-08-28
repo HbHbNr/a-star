@@ -47,7 +47,7 @@ class Matrix:
             neighbourNode = Node(currentNode.x + offset[0], currentNode.y + offset[1])
             if neighbourNode == currentParentNode:
                 continue  # do not go one step back
-            elif neighbourNode.x == self._maxx or neighbourNode.y == self._maxy \
+            if neighbourNode.x == self._maxx or neighbourNode.y == self._maxy \
                     or neighbourNode.x == -1 or neighbourNode.y == -1:
                 continue  # ignore coordinates outside of the matrix
             # print('  Neighbour:', neighbourNode)
@@ -106,33 +106,32 @@ class MatrixAStar:
                 # target reached
                 # print('target reached, distance', distanceFromStart)
                 break
-            else:
-                neighbours: List[PathNode] = \
-                    cls.findValidNeighbours(matrix, isNodeInCloseList, distanceFromStart, currentPathNode, targetNode)
-                needsHeapify = False
-                for neighbour in neighbours:  # all neighbours are not in closeList
-                    if neighbour.node not in openListMap:
-                        heapq.heappush(openList, neighbour)
-                        openListMap[neighbour.node] = neighbour
-                        # print('  ', neighbour, ' new', sep='')
-                    else:
-                        oldneighbour: PathNode = openListMap[neighbour.node]
-                        if neighbour.pathLength < oldneighbour.pathLength:  # new neighbour has shorter total path
-                            oldneighbour.pathLength = neighbour.pathLength
-                            oldneighbour.distanceFromStart = neighbour.distanceFromStart
-                            oldneighbour.parent = neighbour.parent
-                            needsHeapify = True
-                            # print('  ', neighbour, ' updated', sep='')
-                        # else:
-                            # print('  ', neighbour, ' ignored, because not shorter', sep='')
-                if needsHeapify:
-                    # print('will reorder heap')
-                    heapq.heapify(openList)
+            # if target not yet reached:
+            neighbours: List[PathNode] = \
+                cls.findValidNeighbours(matrix, isNodeInCloseList, distanceFromStart, currentPathNode, targetNode)
+            needsHeapify = False
+            for neighbour in neighbours:  # all neighbours are not in closeList
+                if neighbour.node not in openListMap:
+                    heapq.heappush(openList, neighbour)
+                    openListMap[neighbour.node] = neighbour
+                    # print('  ', neighbour, ' new', sep='')
+                else:
+                    oldneighbour: PathNode = openListMap[neighbour.node]
+                    if neighbour.pathLength < oldneighbour.pathLength:  # new neighbour has shorter total path
+                        oldneighbour.pathLength = neighbour.pathLength
+                        oldneighbour.distanceFromStart = neighbour.distanceFromStart
+                        oldneighbour.parent = neighbour.parent
+                        needsHeapify = True
+                        # print('  ', neighbour, ' updated', sep='')
+                    # else:
+                        # print('  ', neighbour, ' ignored, because not shorter', sep='')
+            if needsHeapify:
+                # print('will reorder heap')
+                heapq.heapify(openList)
         if targetNode in closeList:
             return closeList[targetNode].distanceFromStart
-        else:
-            # no path between startNode and targetNode
-            return -1
+        # no path between startNode and targetNode
+        return -1
 
     @classmethod
     def findValidNeighbours(cls, matrix: Matrix, isNodeInCloseList, distanceFromStart: int, currentPathNode: PathNode,
