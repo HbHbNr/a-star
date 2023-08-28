@@ -41,12 +41,13 @@ class Matrix:
         self._weights = weights
         # print(self._weights)
 
-    def findNeighbourNodes(self, isNodeInCloseList, currentPathNode: PathNode) -> List[Node]:
+    def findNeighbourNodes(self, isNodeInCloseList, currentNode: Node, currentParentNode: Node) -> List[Node]:
         neighbourNodes: List[Node] = []
         for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)]:  # right, below, left, above
-            neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
-            # TODO: ignore if exactly one step back
-            if neighbourNode.x == self._maxx or neighbourNode.y == self._maxy \
+            neighbourNode = Node(currentNode.x + offset[0], currentNode.y + offset[1])
+            if neighbourNode == currentParentNode:
+                continue  # do not go one step back
+            elif neighbourNode.x == self._maxx or neighbourNode.y == self._maxy \
                     or neighbourNode.x == -1 or neighbourNode.y == -1:
                 continue  # ignore coordinates outside of the matrix
             # print('  Neighbour:', neighbourNode)
@@ -130,13 +131,14 @@ class MatrixAStar:
     @classmethod
     def findValidNeighbours(cls, matrix: Matrix, isNodeInCloseList, distanceFromStart: int, currentPathNode: PathNode,
                             targetNode: Node) -> List[PathNode]:
-        neighbourNodes: List[Node] = matrix.findNeighbourNodes(isNodeInCloseList, currentPathNode)
+        currentNode = currentPathNode.node
+        neighbourNodes: List[Node] = matrix.findNeighbourNodes(isNodeInCloseList, currentNode, currentPathNode.parent)
         validNeighbours: List[PathNode] = []
         for neighbourNode in neighbourNodes:
             g = distanceFromStart + matrix.getWeight(neighbourNode)
             h = neighbourNode.heuristicPathLength(targetNode)
             f = g + h
-            neighbourPathNode = PathNode(f, g, neighbourNode, currentPathNode.node)
+            neighbourPathNode = PathNode(f, g, neighbourNode, currentNode)
             # print('    ', neighbourPathNode, sep='')
             validNeighbours.append(neighbourPathNode)
         return validNeighbours
