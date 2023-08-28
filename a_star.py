@@ -38,10 +38,7 @@ class Matrix:
     def __init__(self, weights: List[List[int]]) -> None:
         self._maxx = len(weights[0])
         self._maxy = len(weights)
-        self._weights: List[List[int]] = []
-        self._weights.append([9] * (1 + self._maxx + 1))
-        self._weights.extend([[9] + weights2 + [9] for weights2 in weights])
-        self._weights.append([9] * (1 + self._maxx + 1))
+        self._weights = weights
         print(self._weights)
 
     def getWeight(self, node: Node) -> int:
@@ -63,12 +60,12 @@ class MatrixAStar:
             currentPathNode: PathNode = heapq.heappop(openList)
             print(currentPathNode)
             distanceFromStart: int = currentPathNode.distanceFromStart
+            closeList[currentPathNode.node] = currentPathNode
             if currentPathNode.node == targetNode:
                 # reached target
                 print('target reached, distance', distanceFromStart)
                 break
             else:
-                closeList[currentPathNode.node] = currentPathNode
                 neighbours: List[PathNode] = \
                     cls.findNeighbours(matrix, closeList, distanceFromStart, currentPathNode, targetNode)
                 needsHeapify = False
@@ -91,7 +88,11 @@ class MatrixAStar:
                 if needsHeapify:
                     print('will reorder heap')
                     heapq.heapify(openList)
-        return currentPathNode.pathLength
+        if targetNode in closeList:
+            return closeList[targetNode].distanceFromStart
+        else:
+            # no path between startNode and targetNode
+            return -1
 
     @classmethod
     def findNeighbours(cls, matrix: Matrix, closeList, distanceFromStart: int, currentPathNode: PathNode, targetNode: Node) \
@@ -99,8 +100,8 @@ class MatrixAStar:
         neighbours: List[PathNode] = []
         for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)]:  # right, below, left, above
             neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
-            if neighbourNode.x == matrix._maxx + 1 or neighbourNode.y == matrix._maxy + 1 \
-                    or neighbourNode.x == 0 or neighbourNode.y == 0:
+            if neighbourNode.x == matrix._maxx or neighbourNode.y == matrix._maxy \
+                    or neighbourNode.x == -1 or neighbourNode.y == -1:
                 continue  # ignore coordinates outside of the matrix
             else:
                 print('  Neighbour:', neighbourNode)
@@ -124,10 +125,11 @@ def readinputfile(inputfile: str) -> List[List[int]]:
 
 
 if __name__ == '__main__':
-    weights = readinputfile('../adventofcode2021/inputfiles/day15_example.txt')
-    # weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
-    startNode = Node(1, 1)
-    targetNode = Node(len(weights[0]), len(weights))
+    # weights = readinputfile('../adventofcode2021/inputfiles/day15_example.txt')
+    weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
+    startNode = Node(0, 0)
+    targetNode = Node(len(weights[0]) - 1, len(weights) - 1)
+    print(targetNode)
 
     matrix = Matrix(weights)
     distanceFromStart = MatrixAStar.findPath(matrix, startNode, targetNode)

@@ -9,8 +9,8 @@ def weightsstring2weights(weightsstring: str) -> List[List[int]]:
 
 def test_2x2():
     weightsstring = '12,13'
-    startNode = Node(1, 1)
-    targetNode = Node(2, 2)
+    startNode = Node(0, 0)
+    targetNode = Node(1, 1)
     matrix = Matrix(weightsstring2weights(weightsstring))
 
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 4
@@ -18,8 +18,8 @@ def test_2x2():
 
 def test_3x3():
     weightsstring = '116,138,213'
-    startNode = Node(1, 1)
-    targetNode = Node(3, 3)
+    startNode = Node(0, 0)
+    targetNode = Node(2, 2)
     matrix = Matrix(weightsstring2weights(weightsstring))
 
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 7
@@ -27,8 +27,8 @@ def test_3x3():
 
 def test_4x3():
     weightsstring = '1163,1381,2136'
-    startNode = Node(1, 1)
-    targetNode = Node(4, 3)
+    startNode = Node(0, 0)
+    targetNode = Node(3, 2)
     matrix = Matrix(weightsstring2weights(weightsstring))
 
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 13
@@ -37,8 +37,8 @@ def test_4x3():
 def test_aoc2021_day15_example():
     inputfile = 'inputfiles/aoc2021_day15_example.txt'
     weights = readinputfile(inputfile)
-    startNode = Node(1, 1)
-    targetNode = Node(len(weights[0]), len(weights))
+    startNode = Node(0, 0)
+    targetNode = Node(len(weights[0]) - 1, len(weights) - 1)
     matrix = Matrix(weights)
 
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 40
@@ -47,8 +47,8 @@ def test_aoc2021_day15_example():
 def test_aoc2021_day15_input():
     inputfile = 'inputfiles/aoc2021_day15_input.txt'
     weights = readinputfile(inputfile)
-    startNode = Node(1, 1)
-    targetNode = Node(len(weights[0]), len(weights))
+    startNode = Node(0, 0)
+    targetNode = Node(len(weights[0]) - 1, len(weights) - 1)
     matrix = Matrix(weights)
 
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 458
