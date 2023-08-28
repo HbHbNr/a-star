@@ -24,6 +24,7 @@ class Node(NamedTuple):
 class PathNode:
 
     pathLength: int
+    distanceFromStart: int
     node: Node
     parent: Node
 
@@ -44,7 +45,8 @@ class Graph:
 
     def findPath(self, startNode: Node, targetNode: Node) -> int:
         openList: List[PathNode] = []  # heapq
-        openList.append(PathNode(0, startNode, startNode))  # startNode is its own parent
+        # startNode is its own parent:
+        openList.append(PathNode(startNode.heuristicPathLength(targetNode), 0, startNode, startNode))
         openListMap: Dict[Node, PathNode] = {}
         closeList: Dict[Node, PathNode] = {}
         while openList:
@@ -52,7 +54,7 @@ class Graph:
             print(openList)
             currentPathNode: PathNode = heapq.heappop(openList)
             print(currentPathNode)
-            distanceFromStart: int = currentPathNode.pathLength
+            distanceFromStart: int = currentPathNode.distanceFromStart
             if currentPathNode.node == targetNode:
                 # reached target
                 print('target reached, distance', distanceFromStart)
@@ -69,7 +71,7 @@ class Graph:
                         print('  ', neighbour, ' new', sep='')
                     else:
                         oldneighbour: PathNode = openListMap[neighbour.node]
-                        if neighbour.pathLength < oldneighbour.pathLength:  # new neighbour has shorter path
+                        if neighbour.pathLength < oldneighbour.pathLength:  # new neighbour has shorter total path
                             oldneighbour.pathLength = neighbour.pathLength
                             oldneighbour.parent = neighbour.parent
                             needsHeapify = True
@@ -88,14 +90,14 @@ class Graph:
             neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
             if neighbourNode.x == self._maxx + 1 or neighbourNode.y == self._maxy + 1 \
                     or neighbourNode.x == 0 or neighbourNode.y == 0:
-                continue  # ignore frame of 9s
+                continue  # ignore coordinates outside of the matrix
             else:
                 print('  Neighbour:', neighbourNode)
             if neighbourNode not in closeList:
                 g = distanceFromStart + self._weights[neighbourNode.y][neighbourNode.x]
                 h = neighbourNode.heuristicPathLength(targetNode)
                 f = g + h
-                neighbourPathNode = PathNode(f, neighbourNode, currentPathNode.node)
+                neighbourPathNode = PathNode(f, g, neighbourNode, currentPathNode.node)
                 print('    ', neighbourPathNode, sep='')
                 neighbours.append(neighbourPathNode)
             else:
@@ -104,22 +106,26 @@ class Graph:
 
 
 if __name__ == '__main__':
-    # weightsstring = \
-    #     '1163751742,1381373672,2136511328,3694931569,7463417111,1319128137,1359912421,3125421639,1293138521,2311944581'
-    # startNode = Node(1, 1)
-    # targetNode = Node(10, 10)
+    weightsstring = \
+        '1163751742,1381373672,2136511328,3694931569,7463417111,1319128137,1359912421,3125421639,1293138521,2311944581'
+    startNode = Node(1, 1)
+    targetNode = Node(10, 10)
+    # -> distance: 40
 
     # weightsstring = '1163,1381,2136'
     # startNode = Node(1, 1)
     # targetNode = Node(4, 3)
+    # -> distance: 13
 
-    weightsstring = '116,138,213'
-    startNode = Node(1, 1)
-    targetNode = Node(3, 3)
+    # weightsstring = '116,138,213'
+    # startNode = Node(1, 1)
+    # targetNode = Node(3, 3)
+    # -> distance: 7
 
     # weightsstring = '12,13'
     # startNode = Node(1, 1)
     # targetNode = Node(2, 2)
+    # -> distance: 4
 
     weights: List[List[int]] = [list(map(int, list(row))) for row in weightsstring.split(',')]
     graph = Graph(weights)
