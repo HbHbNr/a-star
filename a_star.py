@@ -39,7 +39,7 @@ class Matrix:
         self._maxx = len(weights[0])
         self._maxy = len(weights)
         self._weights = weights
-        print(self._weights)
+        # print(self._weights)
 
     def getWeight(self, node: Node) -> int:
         return self._weights[node.y][node.x]
@@ -55,15 +55,14 @@ class MatrixAStar:
         openListMap: Dict[Node, PathNode] = {}
         closeList: Dict[Node, PathNode] = {}
         while openList:
-            print()
-            print(openList)
+            # print()
+            # print(openList)
             currentPathNode: PathNode = heapq.heappop(openList)
-            print(currentPathNode)
             distanceFromStart: int = currentPathNode.distanceFromStart
             closeList[currentPathNode.node] = currentPathNode
             if currentPathNode.node == targetNode:
-                # reached target
-                print('target reached, distance', distanceFromStart)
+                # target reached
+                # print('target reached, distance', distanceFromStart)
                 break
             else:
                 neighbours: List[PathNode] = \
@@ -74,7 +73,7 @@ class MatrixAStar:
                         openList.append(neighbour)
                         openListMap[neighbour.node] = neighbour
                         needsHeapify = True
-                        print('  ', neighbour, ' new', sep='')
+                        # print('  ', neighbour, ' new', sep='')
                     else:
                         oldneighbour: PathNode = openListMap[neighbour.node]
                         if neighbour.pathLength < oldneighbour.pathLength:  # new neighbour has shorter total path
@@ -82,11 +81,11 @@ class MatrixAStar:
                             oldneighbour.distanceFromStart = neighbour.distanceFromStart
                             oldneighbour.parent = neighbour.parent
                             needsHeapify = True
-                            print('  ', neighbour, ' updated', sep='')
-                        else:
-                            print('  ', neighbour, ' ignored, because not shorter', sep='')
+                            # print('  ', neighbour, ' updated', sep='')
+                        # else:
+                            # print('  ', neighbour, ' ignored, because not shorter', sep='')
                 if needsHeapify:
-                    print('will reorder heap')
+                    # print('will reorder heap')
                     heapq.heapify(openList)
         if targetNode in closeList:
             return closeList[targetNode].distanceFromStart
@@ -104,16 +103,18 @@ class MatrixAStar:
                     or neighbourNode.x == -1 or neighbourNode.y == -1:
                 continue  # ignore coordinates outside of the matrix
             else:
-                print('  Neighbour:', neighbourNode)
+                # print('  Neighbour:', neighbourNode)
+                pass
             if neighbourNode not in closeList:
                 g = distanceFromStart + matrix.getWeight(neighbourNode)
                 h = neighbourNode.heuristicPathLength(targetNode)
                 f = g + h
                 neighbourPathNode = PathNode(f, g, neighbourNode, currentPathNode.node)
-                print('    ', neighbourPathNode, sep='')
+                # print('    ', neighbourPathNode, sep='')
                 neighbours.append(neighbourPathNode)
             else:
-                print('    ignored, because in closeList')
+                # print('    ignored, because in closeList')
+                pass
         return neighbours
 
 
@@ -129,8 +130,7 @@ if __name__ == '__main__':
     weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
     startNode = Node(0, 0)
     targetNode = Node(len(weights[0]) - 1, len(weights) - 1)
-    print(targetNode)
 
     matrix = Matrix(weights)
     distanceFromStart = MatrixAStar.findPath(matrix, startNode, targetNode)
-    print(distanceFromStart)
+    print('Day {:>3}: {}'.format('15a', distanceFromStart))
