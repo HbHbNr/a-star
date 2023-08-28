@@ -1,4 +1,4 @@
-from a_star import Node, Matrix, MatrixAStar, readinputfile
+from a_star import Node, Matrix, Matrix5x5, MatrixAStar, readinputfile
 from typing import List
 
 
@@ -34,7 +34,7 @@ def test_4x3():
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 13
 
 
-def test_aoc2021_day15_example():
+def test_aoc2021_day15a_example():
     inputfile = 'inputfiles/aoc2021_day15_example.txt'
     weights = readinputfile(inputfile)
     startNode = Node(0, 0)
@@ -44,7 +44,7 @@ def test_aoc2021_day15_example():
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 40
 
 
-def test_aoc2021_day15_input():
+def test_aoc2021_day15a_input():
     inputfile = 'inputfiles/aoc2021_day15_input.txt'
     weights = readinputfile(inputfile)
     startNode = Node(0, 0)
@@ -52,3 +52,25 @@ def test_aoc2021_day15_input():
     matrix = Matrix(weights)
 
     assert MatrixAStar.findPath(matrix, startNode, targetNode) == 458
+
+
+def test_aoc2021_day15b_example():
+    inputfile = 'inputfiles/aoc2021_day15_example.txt'
+    weights = readinputfile(inputfile)
+    startNode = Node(0, 0)
+    targetNode = Node(len(weights[0]) * 5 - 1, len(weights) * 5 - 1)
+    matrix = Matrix(weights)
+    matrix5x5 = Matrix5x5(matrix)
+
+    assert MatrixAStar.findPath(matrix5x5, startNode, targetNode) == 315
+
+
+def test_aoc2021_day15b_input():
+    inputfile = 'inputfiles/aoc2021_day15_input.txt'
+    weights = readinputfile(inputfile)
+    startNode = Node(0, 0)
+    targetNode = Node(len(weights[0]) * 5 - 1, len(weights) * 5 - 1)
+    matrix = Matrix(weights)
+    matrix5x5 = Matrix5x5(matrix)
+
+    assert MatrixAStar.findPath(matrix5x5, startNode, targetNode) == 2800
