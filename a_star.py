@@ -1,6 +1,7 @@
 from typing import List, NamedTuple, Dict
 from dataclasses import dataclass
 import heapq
+import fileinput
 
 
 class Node(NamedTuple):
@@ -29,7 +30,7 @@ class PathNode:
     parent: Node
 
     def __repr__(self) -> str:
-        return f'({self.pathLength};{self.node};{self.parent})'
+        return f'({self.pathLength};{self.distanceFromStart};{self.node};{self.parent})'
 
 
 class Graph:
@@ -73,6 +74,7 @@ class Graph:
                         oldneighbour: PathNode = openListMap[neighbour.node]
                         if neighbour.pathLength < oldneighbour.pathLength:  # new neighbour has shorter total path
                             oldneighbour.pathLength = neighbour.pathLength
+                            oldneighbour.distanceFromStart = neighbour.distanceFromStart
                             oldneighbour.parent = neighbour.parent
                             needsHeapify = True
                             print('  ', neighbour, ' updated', sep='')
@@ -105,11 +107,18 @@ class Graph:
         return neighbours
 
 
+def readinputfile(inputfile: str) -> List[List[int]]:
+    weights: List[List[int]] = []
+    for line in fileinput.input(inputfile):
+        weights.append([int(c) for c in line.strip()])
+    return weights
+
+
 if __name__ == '__main__':
-    weightsstring = \
-        '1163751742,1381373672,2136511328,3694931569,7463417111,1319128137,1359912421,3125421639,1293138521,2311944581'
-    startNode = Node(1, 1)
-    targetNode = Node(10, 10)
+    # weightsstring = \
+    #     '1163751742,1381373672,2136511328,3694931569,7463417111,1319128137,1359912421,3125421639,1293138521,2311944581'
+    # startNode = Node(1, 1)
+    # targetNode = Node(10, 10)
     # -> distance: 40
 
     # weightsstring = '1163,1381,2136'
@@ -126,8 +135,13 @@ if __name__ == '__main__':
     # startNode = Node(1, 1)
     # targetNode = Node(2, 2)
     # -> distance: 4
+    # weights: List[List[int]] = [list(map(int, list(row))) for row in weightsstring.split(',')]
 
-    weights: List[List[int]] = [list(map(int, list(row))) for row in weightsstring.split(',')]
+    # weights = readinputfile('../adventofcode2021/inputfiles/day15_example.txt')
+    weights = readinputfile('../adventofcode2021/inputfiles/day15_input.txt')
+    startNode = Node(1, 1)
+    targetNode = Node(len(weights[0]), len(weights))
+
     graph = Graph(weights)
     distanceFromStart = graph.findPath(startNode, targetNode)  # consider additional frame with 9s
     print(distanceFromStart)
