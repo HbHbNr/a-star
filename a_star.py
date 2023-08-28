@@ -72,6 +72,8 @@ class MatrixAStar:
         openList.append(PathNode(startNode.heuristicPathLength(targetNode), 0, startNode, startNode))
         openListMap: Dict[Node, PathNode] = {}
         closeList: Dict[Node, PathNode] = {}
+        # isNodeInCloseList = lambda node: node in closeList
+        def isNodeInCloseList(node): return node in closeList
         while openList:
             # print()
             # print(openList)
@@ -84,7 +86,7 @@ class MatrixAStar:
                 break
             else:
                 neighbours: List[PathNode] = \
-                    cls.findNeighbours(matrix, closeList, distanceFromStart, currentPathNode, targetNode)
+                    cls.findValidNeighbours(matrix, isNodeInCloseList, distanceFromStart, currentPathNode, targetNode)
                 needsHeapify = False
                 for neighbour in neighbours:  # all neighbours are not in closeList
                     if neighbour.node not in openListMap:
@@ -111,28 +113,33 @@ class MatrixAStar:
             return -1
 
     @classmethod
-    def findNeighbours(cls, matrix: Matrix, closeList, distanceFromStart: int, currentPathNode: PathNode, targetNode: Node) \
-            -> List[PathNode]:
-        neighbours: List[PathNode] = []
+    def findNeighbours(cls, matrix: Matrix, isNodeInCloseList, currentPathNode: PathNode) -> List[Node]:
+        neighbourNodes: List[Node] = []
         for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)]:  # right, below, left, above
             neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
             if neighbourNode.x == matrix._maxx or neighbourNode.y == matrix._maxy \
                     or neighbourNode.x == -1 or neighbourNode.y == -1:
                 continue  # ignore coordinates outside of the matrix
-            else:
-                # print('  Neighbour:', neighbourNode)
-                pass
-            if neighbourNode not in closeList:
-                g = distanceFromStart + matrix.getWeight(neighbourNode)
-                h = neighbourNode.heuristicPathLength(targetNode)
-                f = g + h
-                neighbourPathNode = PathNode(f, g, neighbourNode, currentPathNode.node)
-                # print('    ', neighbourPathNode, sep='')
-                neighbours.append(neighbourPathNode)
-            else:
+            # print('  Neighbour:', neighbourNode)
+            if isNodeInCloseList(neighbourNode):
                 # print('    ignored, because in closeList')
-                pass
-        return neighbours
+                continue
+            neighbourNodes.append(neighbourNode)
+        return neighbourNodes
+
+    @classmethod
+    def findValidNeighbours(cls, matrix: Matrix, isNodeInCloseList, distanceFromStart: int, currentPathNode: PathNode,
+                            targetNode: Node) -> List[PathNode]:
+        neighbourNodes: List[Node] = cls.findNeighbours(matrix, isNodeInCloseList, currentPathNode)
+        validNeighbours: List[PathNode] = []
+        for neighbourNode in neighbourNodes:
+            g = distanceFromStart + matrix.getWeight(neighbourNode)
+            h = neighbourNode.heuristicPathLength(targetNode)
+            f = g + h
+            neighbourPathNode = PathNode(f, g, neighbourNode, currentPathNode.node)
+            # print('    ', neighbourPathNode, sep='')
+            validNeighbours.append(neighbourPathNode)
+        return validNeighbours
 
 
 def readinputfile(inputfile: str) -> List[List[int]]:
