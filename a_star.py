@@ -9,7 +9,11 @@ class Node(NamedTuple):
     y: int
 
     def heuristicPathLength(self, target: 'Node') -> int:
-        h = abs(target.x - self.x) + abs(target.y - self.y)  # Manhattan distance
+        diffx = abs(target.x - self.x)
+        diffy = abs(target.y - self.y)
+        h = diffx + diffy  # Manhattan distance
+        if diffx and diffy:
+            h -= 1  # count crossroad only once
         return h
 
     def __repr__(self) -> str:
@@ -44,27 +48,34 @@ class Graph:
         openListMap: Dict[Node, PathNode] = {}
         closeList: Dict[Node, PathNode] = {}
         while openList:
+            print()
             print(openList)
             currentPathNode: PathNode = heapq.heappop(openList)
+            print(currentPathNode)
             distanceFromStart: int = currentPathNode.pathLength
             if currentPathNode.node == targetNode:
                 # reached target
-                print("target reached, distance ", distanceFromStart)
+                print('target reached, distance', distanceFromStart)
                 break
             else:
                 closeList[currentPathNode.node] = currentPathNode
                 neighbours: List[PathNode] = self.findNeighbours(closeList, distanceFromStart, currentPathNode, targetNode)
                 needsHeapify = False
-                for neighbour in neighbours:  # only neighbours not in closeList
+                for neighbour in neighbours:  # all neighbours are not in closeList
                     if neighbour.node not in openListMap:
                         openList.append(neighbour)
                         openListMap[neighbour.node] = neighbour
+                        needsHeapify = True
+                        print('  ', neighbour, ' new', sep='')
                     else:
                         oldneighbour: PathNode = openListMap[neighbour.node]
                         if neighbour.pathLength < oldneighbour.pathLength:  # new neighbour has shorter path
                             oldneighbour.pathLength = neighbour.pathLength
                             oldneighbour.parent = neighbour.parent
                             needsHeapify = True
+                            print('  ', neighbour, ' updated', sep='')
+                        else:
+                            print('  ', neighbour, ' ignored, because not shorter', sep='')
                 if needsHeapify:
                     print('will reorder heap')
                     heapq.heapify(openList)
@@ -74,22 +85,43 @@ class Graph:
             -> List[PathNode]:
         neighbours: List[PathNode] = []
         for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)]:  # right, below, left, above
-            neighbour = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
-            print('Neighbour:', neighbour)
-            if neighbour.x == self._maxx + 1 or neighbour.y == self._maxy + 1 or neighbour.x == 0 or neighbour.y == 0:
+            neighbourNode = Node(currentPathNode.node.x + offset[0], currentPathNode.node.y + offset[1])
+            if neighbourNode.x == self._maxx + 1 or neighbourNode.y == self._maxy + 1 \
+                    or neighbourNode.x == 0 or neighbourNode.y == 0:
                 continue  # ignore frame of 9s
-            if neighbour not in closeList:
-                g = distanceFromStart + self._weights[neighbour.y][neighbour.x]
-                h = neighbour.heuristicPathLength(targetNode)
+            else:
+                print('  Neighbour:', neighbourNode)
+            if neighbourNode not in closeList:
+                g = distanceFromStart + self._weights[neighbourNode.y][neighbourNode.x]
+                h = neighbourNode.heuristicPathLength(targetNode)
                 f = g + h
-                neighbours.append(PathNode(f, neighbour, currentPathNode.node))
+                neighbourPathNode = PathNode(f, neighbourNode, currentPathNode.node)
+                print('    ', neighbourPathNode, sep='')
+                neighbours.append(neighbourPathNode)
+            else:
+                print('    ignored, because in closeList')
         return neighbours
 
 
 if __name__ == '__main__':
-    weightsstring = \
-        '1163751742,1381373672,2136511328,3694931569,7463417111,1319128137,1359912421,3125421639,1293138521,2311944581'
+    # weightsstring = \
+    #     '1163751742,1381373672,2136511328,3694931569,7463417111,1319128137,1359912421,3125421639,1293138521,2311944581'
+    # startNode = Node(1, 1)
+    # targetNode = Node(10, 10)
+
+    # weightsstring = '1163,1381,2136'
+    # startNode = Node(1, 1)
+    # targetNode = Node(4, 3)
+
+    weightsstring = '116,138,213'
+    startNode = Node(1, 1)
+    targetNode = Node(3, 3)
+
+    # weightsstring = '12,13'
+    # startNode = Node(1, 1)
+    # targetNode = Node(2, 2)
+
     weights: List[List[int]] = [list(map(int, list(row))) for row in weightsstring.split(',')]
     graph = Graph(weights)
-    distanceFromStart = graph.findPath(Node(1, 1), Node(10, 10))  # consider additional frame with 9s
+    distanceFromStart = graph.findPath(startNode, targetNode)  # consider additional frame with 9s
     print(distanceFromStart)
