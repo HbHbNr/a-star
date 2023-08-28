@@ -1,2 +1,2 @@
 # a-star
-Python implementation of the A* search algorithm for graphs with examples
+Implementation of the A* search algorithm for graphs with examples, written in pure Python

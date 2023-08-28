@@ -1,5 +1,5 @@
-from a_star import Node, Matrix, Matrix5x5, MatrixAStar, readinputfile
 from typing import List
+from a_star import Node, Matrix, Matrix5x5, MatrixAStar, readinputfile
 
 
 def weightsstring2weights(weightsstring: str) -> List[List[int]]:

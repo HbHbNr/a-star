@@ -94,8 +94,9 @@ class MatrixAStar:
         openList.append(PathNode(startNode.heuristicPathLength(targetNode), 0, startNode, startNode))
         openListMap: Dict[Node, PathNode] = {}
         closeList: Dict[Node, PathNode] = {}
-        # isNodeInCloseList = lambda node: node in closeList
-        def isNodeInCloseList(node): return node in closeList
+
+        def isNodeInCloseList(node):
+            return node in closeList
         while openList:
             # print()
             # print(openList)
@@ -133,6 +134,7 @@ class MatrixAStar:
         # no path between startNode and targetNode
         return -1
 
+    # pylint: disable=too-many-arguments
     @classmethod
     def findValidNeighbours(cls, matrix: Matrix, isNodeInCloseList, distanceFromStart: int, currentPathNode: PathNode,
                             targetNode: Node) -> List[PathNode]:
@@ -164,12 +166,12 @@ def main():
     matrix = Matrix(weights)
     targetNode = Node(len(weights[0]) - 1, len(weights) - 1)
     distanceFromStart = MatrixAStar.findPath(matrix, startNode, targetNode)
-    print('Day {:>3}: {}'.format('15a', distanceFromStart))  # e:40 / i:458
+    print(f'Day 15a: {distanceFromStart}')  # e:40 / i:458
 
     matrix5x5 = Matrix5x5(matrix)
     targetNode = Node(len(weights[0]) * 5 - 1, len(weights) * 5 - 1)
     distanceFromStart = MatrixAStar.findPath(matrix5x5, startNode, targetNode)
-    print('Day {:>3}: {}'.format('15b', distanceFromStart))  # e:315 / i:2800
+    print(f'Day 15a: {distanceFromStart}')  # e:315 / i:2800
 
 
 if __name__ == '__main__':
